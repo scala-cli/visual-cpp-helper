@@ -1,0 +1,42 @@
+name: CI
+on:
+  push:
+    branches:
+    - main
+    tags:
+    - "v*"
+  pull_request:
+
+jobs:
+  compile:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - uses: coursier/cache-action@v6.3
+    - uses: VirtusLab/scala-cli-setup@v0.1
+      with:
+        jvm: zulu:17
+    - name: Compile
+      run: ./scala-cli.sh compile . --cross
+
+  publish:
+    needs: compile
+    if: github.event_name == 'push'
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - uses: coursier/cache-action@v6.3
+    - uses: VirtusLab/scala-cli-setup@v0.1
+      with:
+        jvm: zulu:17
+    - name: Publish
+      run: ./scala-cli.sh publish . --cross
+      env:
+        PUBLISH_USER: ${{ secrets.PUBLISH_USER }}
+        PUBLISH_PASSWORD: ${{ secrets.PUBLISH_PASSWORD }}
+        PUBLISH_SECRET_KEY: ${{ secrets.PUBLISH_SECRET_KEY }}
+        PUBLISH_SECRET_KEY_PASSWORD: ${{ secrets.PUBLISH_SECRET_KEY_PASSWORD }}
