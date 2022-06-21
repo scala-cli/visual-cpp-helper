@@ -20,6 +20,7 @@ jobs:
         jvm: zulu:17
     - name: Compile
       run: ./scala-cli.sh compile . --cross
+      shell: bash
 
   publish:
     needs: compile
@@ -35,6 +36,7 @@ jobs:
         jvm: zulu:17
     - name: Publish
       run: ./scala-cli.sh publish . --cross
+      shell: bash
       env:
         PUBLISH_USER: ${{ secrets.PUBLISH_USER }}
         PUBLISH_PASSWORD: ${{ secrets.PUBLISH_PASSWORD }}
